@@ -145,7 +145,7 @@ predictions = []
 
 # Iterate over each row of the DataFrame and apply the prediction function
 for idx, row in data_validation.iterrows():
-    text = row['Notes Page Content2']
+    text = str(row['Notes Page Content2'])  # Ensure text is converted to string
     result = predict_text(text)
     for pred in result:
         pred.update({
