@@ -143,7 +143,7 @@ st.title("Business Description Classifier")
 col1, col2 = st.columns([1,2])
 
 with col1:
-    st.write(ssic_n_sl, use_container_width=True)
+    st.dataframe(ssic_n_sl, use_container_width=True)
 
 with col2:
     # page subheader
