@@ -39,7 +39,7 @@ st.balloons()
 # loaded_model = TFDistilBertForSequenceClassification.from_pretrained(model_files_path) #TODO
 
 tokenizer = AutoTokenizer.from_pretrained("nusebacra/ssicsync_section_classifier")
-model = AutoModelForSequenceClassification.from_pretrained("nusebacra/ssicsync_section_classifier", from_tf=True)
+model = AutoModelForSequenceClassification.from_pretrained("nusebacra/ssicsync_section_classifier")
 
 
 
@@ -163,7 +163,6 @@ if user_input:
 
     inputs = tokenizer(user_input, return_tensors="tf")
     outputs = model(inputs)
-    outputs = outputs.logits
     
     # output_array = tf.nn.softmax(outputs, axis=-1).numpy()
     output_array = outputs.numpy() # Logits (+ve to -ve)
