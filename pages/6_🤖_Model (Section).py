@@ -36,30 +36,11 @@ conn = st.connection('gcs', type=FilesConnection)
 # Specify the paths to the model and tokenizer files in the bucket.
 model_files_path = "nusebacra_bucket1/models/distilBert Text Multiclass by 21 Section caa 200624"
 
-# List all files in the specified model directory
-files = conn.list_files(model_files_path)
-
-# Define local directory to temporarily store the files
-save_directory = "/tmp/distilbert_model"
-
-# Create the directory if it doesn't exist
-os.makedirs(save_directory, exist_ok=True)
-
-# Download each file in the model directory to the local directory
-for file in files:
-    if file.startswith(model_files_path):
-        file_content = conn.read(file, input_format="binary", ttl=600)
-        local_file_path = os.path.join(save_directory, os.path.basename(file))
-        with open(local_file_path, "wb") as f:
-            f.write(file_content)
-
-
-
 # save_directory = "LLM_Test/distilBert Text Multiclass by 21 Section caa 200624"
 ###############################################################################################################################################
 
-loaded_tokenizer = DistilBertTokenizer.from_pretrained(save_directory) #TODO
-loaded_model = TFDistilBertForSequenceClassification.from_pretrained(save_directory) #TODO
+loaded_tokenizer = DistilBertTokenizer.from_pretrained(model_files_path) #TODO
+loaded_model = TFDistilBertForSequenceClassification.from_pretrained(model_files_path) #TODO
 
 
 
