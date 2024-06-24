@@ -165,21 +165,23 @@ if user_input:
 
     inputs = tokenizer(user_input, return_tensors="tf")
 
-    # Perform inference
-    # with torch.no_grad():
-    #     outputs = model(**inputs)
+    output = loaded_model(predict_input)[0]
 
-    # Perform inference
-    outputs = model(**inputs)
+    # Convert the output tensor to numpy array
+    output_array = output.numpy() # Logits (+ve to -ve)
+    # output_array = tf.nn.softmax(output, axis=-1).numpy() # Probability (0-1)
 
-    # Access logits
-    logits = outputs.logits
+    # # Perform inference
+    # outputs = model(**inputs)
 
-    # Convert logits to probabilities
-    probabilities = tf.nn.softmax(logits, axis=-1)
+    # # Access logits
+    # logits = outputs.logits
 
-    # Convert probabilities to numpy array
-    output_array = probabilities.numpy()
+    # # Convert logits to probabilities
+    # probabilities = tf.nn.softmax(logits, axis=-1)
+
+    # # Convert probabilities to numpy array
+    # output_array = probabilities.numpy()
     
     # output_array = tf.nn.softmax(outputs, axis=-1).numpy()
     # output_array = outputs.numpy() # Logits (+ve to -ve)
