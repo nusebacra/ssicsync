@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
-from st_files_connection import FilesConnection
+import tensorflow as tf
 
 
 # Set page config
@@ -23,10 +23,6 @@ st.balloons()
 
 # Load model and test
 
-from transformers import DistilBertTokenizer
-from transformers import TFDistilBertForSequenceClassification
-import tensorflow as tf
-import pandas as pd
 
 ###############################################################################################################################################
 # Create connection object and retrieve file contents.
