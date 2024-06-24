@@ -207,21 +207,9 @@ with col2:
 
         sorted_output_df.columns = ['encoded_cat', 'Value']
 
-        # Conditional statements based on lvl_train
-        if lvl_train == 'Section':
-            ssic_lvl = ssic_1
-        elif lvl_train == 'Division':
-            ssic_lvl = ssic_2
-        elif lvl_train == 'Group':
-            ssic_lvl = ssic_3
-        elif lvl_train == 'Class':
-            ssic_lvl = ssic_4
-        elif lvl_train == 'SSIC 2020':
-            ssic_lvl = ssic_5
-
         # Merge DataFrames
         lvl_dict = df_prep[[lvl_train, 'encoded_cat']].drop_duplicates()
-        lvl_ref = ssic_lvl[[lvl_train, lvl_train_title]].drop_duplicates()
+        lvl_ref = ssic_4[[lvl_train, lvl_train_title]].drop_duplicates()
         merged_df = lvl_dict.merge(lvl_ref, on=lvl_train, how='left')
         merged_df2 = sorted_output_df.merge(merged_df, on='encoded_cat', how='left')
 
