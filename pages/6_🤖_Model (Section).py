@@ -39,7 +39,7 @@ st.balloons()
 # loaded_model = TFDistilBertForSequenceClassification.from_pretrained(model_files_path) #TODO
 
 tokenizer = AutoTokenizer.from_pretrained("nusebacra/ssicsync_section_classifier")
-model = AutoModelForSequenceClassification.from_pretrained("nusebacra/ssicsync_section_classifier")
+model = AutoModelForSequenceClassification.from_pretrained("nusebacra/ssicsync_section_classifier", from_tf=True)
 
 
 
