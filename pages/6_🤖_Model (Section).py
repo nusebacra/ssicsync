@@ -167,13 +167,21 @@ if user_input:
     output_array = tf.nn.softmax(outputs, axis=-1).numpy()
     # output_array = output.numpy() # Logits (+ve to -ve)
     
-    # Define class weights
-    class_weights = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-    weighted_output_array = output_array * class_weights
+    ###############################################################################################################################################
+    # Define specific weights for the classes (example weights, for Probability)
+    # class_weights = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.5, 0.5, 0.5, 1, 1, 1, 1, 1, 1, 1, 1]  
+    # class_weights = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1] # Adjust the weights according to your classes
+
+
+    # Apply the class weights to the output array
+    weighted_output_array = output_array #* class_weights
+    ############################################################################################################################################### 
 
     # Create a DataFrame from the output array
     sorted_output_df = pd.DataFrame(weighted_output_array.T, columns=['Score']).sort_values(by='Score', ascending=False)
     sorted_output_df.reset_index(inplace=True)
+
+
     sorted_output_df.columns = ['encoded_cat', 'Value']
 
     lvl_train = 'Section'
