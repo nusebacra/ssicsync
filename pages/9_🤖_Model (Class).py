@@ -231,6 +231,6 @@ with col2:
 
         # Display the result as a table
         st.subheader("Prediction Results")
-        st.table(merged_df2[['Value', lvl_train, lvl_train_title]].head(382))
+        st.table(merged_df2[['Value', lvl_train, lvl_train_title]].head(5))
 
 
