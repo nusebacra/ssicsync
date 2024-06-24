@@ -162,7 +162,7 @@ if user_input:
     # output = loaded_model(predict_input)[0]
 
     inputs = tokenizer(user_input, return_tensors="tf")
-    outputs = model(inputs["input_ids"])
+    outputs = model(inputs["input_ids"])[0]
     
     # output_array = tf.nn.softmax(output, axis=-1).numpy()
     output_array = outputs.numpy() # Logits (+ve to -ve)   
