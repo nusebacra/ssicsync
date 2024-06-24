@@ -4,14 +4,10 @@ import pandas as pd
 from sklearn import datasets
 import matplotlib.pyplot as plt
 import seaborn as sns
-import os
-from transformers import AutoTokenizer, AutoModelForSequenceClassification, TFAutoModelForSequenceClassification
 import tensorflow as tf
-import torch
-
 
 # Set page config
-apptitle = 'DSSI Workshop - SSIC Section Classification'
+apptitle = 'DSSI Workshop - SSIC Division Classification'
 
 st.set_page_config(page_title=apptitle, layout='wide')
 
@@ -20,50 +16,42 @@ st.write('Reference: https://docs.streamlit.io/en/stable/api.html#display-data')
 
 # Visual Effects ### - https://docs.streamlit.io/develop/api-reference/status
 st.balloons() 
-####################
-
-# Load model and test
 
 
-###############################################################################################################################################
-# Create connection object and retrieve file contents.
-# # Specify input format is a csv and to cache the result for 600 seconds.
-# conn = st.connection('gcs', type=FilesConnection)
-
-# # Specify the paths to the model and tokenizer files in the bucket.
-# model_files_path = "nusebacra_bucket1/models/distilBert Text Multiclass by 21 Section caa 200624"
-
-# save_directory = "LLM_Test/distilBert Text Multiclass by 21 Section caa 200624"
-###############################################################################################################################################
-
-# loaded_tokenizer = DistilBertTokenizer.from_pretrained(model_files_path) #TODO
-# loaded_model = TFDistilBertForSequenceClassification.from_pretrained(model_files_path) #TODO
-
-tokenizer = AutoTokenizer.from_pretrained("nusebacra/ssicsync_section_classifier")
-# model = AutoModelForSequenceClassification.from_pretrained("nusebacra/ssicsync_section_classifier", from_tf=True)
-model = TFAutoModelForSequenceClassification.from_pretrained("nusebacra/ssicsync_section_classifier")
+# load model directly from huggingface
+from transformers import AutoTokenizer, TFAutoModelForSequenceClassification
+tokenizer = AutoTokenizer.from_pretrained("nusebacra/ssicsync_division_classifier")
+model = TFAutoModelForSequenceClassification.from_pretrained("nusebacra/ssicsync_division_classifier")
 
 
 
-###############################################################################################################################
+# create ssic denormalized fact table
+ssic_detailed_def_filepath = "ssic2020-detailed-definitions.xlsx"
+ssic_alpha_index_filepath = "ssic2020-alphabetical-index.xlsx"
 
-ssic_detailed_def_filename = "ssic2020-detailed-definitions.xlsx"
-ssic_alpha_index_filename = "ssic2020-alphabetical-index.xlsx"
+df_detailed_def = pd.read_excel(ssic_detailed_def_filepath, skiprows=4)
 
-df_detailed_def = pd.read_excel(ssic_detailed_def_filename, skiprows=4)
-df_alpha_index = pd.read_excel(ssic_alpha_index_filename, dtype=str, skiprows=5)
-
+df_alpha_index = pd.read_excel(ssic_alpha_index_filepath, dtype=str, skiprows=5)
 df_alpha_index = df_alpha_index.drop(df_alpha_index.columns[2], axis=1).dropna().rename(columns={'SSIC 2020': 'SSIC 2020','SSIC 2020 Alphabetical Index Description': 'Detailed Definitions'})
+
 df_concat = pd.concat([df_detailed_def, df_alpha_index])
 
-###############################################################################################################################################
-# Select which dictionary to train
-# 1 - df_detailed_def
-# 2 - df_concat (df_detailed_def and df_alpha_index)
+####################################################################################################
+# select which fact table to train/transform
+# - df_detailed_def
+# - df_concat       (concat of df_detailed_def and df_alpha_index)
 df_data_dict = df_detailed_def 
-###############################################################################################################################################
 
-# Prep SSIC ref-join tables
+# select ssic level of train/test
+# - 'Section'
+# - 'Division'
+# - 'Group'
+# - 'Class'
+# - 'Subclass'
+level = 'Group' 
+####################################################################################################
+
+# prep ssic_n tables for joining/merging and reference
 # Section, 1-alpha 
 ssic_1_raw = df_data_dict[df_data_dict['SSIC 2020'].apply(lambda x: len(str(x)) == 1)].reset_index(drop=True).drop(columns=['Detailed Definitions', 'Cross References', 'Examples of Activities Classified Under this Code']) 
 ssic_1_raw['Groups Classified Under this Code'] = ssic_1_raw['Groups Classified Under this Code'].str.split('\n•')
@@ -98,42 +86,68 @@ ssic_5 = df_data_dict[df_data_dict['SSIC 2020'].apply(lambda x: len(str(x)) == 5
 ssic_5.replace('<Blank>', '', inplace=True)
 ssic_5.replace('NaN', '', inplace=True)
 
-# Prep join columns
+# prep join columns
 ssic_5['Section, 2 digit code'] = ssic_5['SSIC 2020'].astype(str).str[:2]
 ssic_5['Division'] = ssic_5['SSIC 2020'].astype(str).str[:2]
 ssic_5['Group'] = ssic_5['SSIC 2020'].astype(str).str[:3]
 ssic_5['Class'] = ssic_5['SSIC 2020'].astype(str).str[:4]
 
-# Join ssic_5 to Hierarhical Layer Tables (Section, Division, Group, Class, Sub-Class)
+# join ssic_n Hierarhical Layer Tables (Section, Division, Group, Class, Sub-Class)
 ssic_df = pd.merge(ssic_5, ssic_1[['Section', 'Section Title', 'Section, 2 digit code']], on='Section, 2 digit code', how='left')
 ssic_df = pd.merge(ssic_df, ssic_2[['Division', 'Division Title']], on='Division', how='left')
 ssic_df = pd.merge(ssic_df, ssic_3[['Group', 'Group Title']], on='Group', how='left')
 ssic_df = pd.merge(ssic_df, ssic_4[['Class', 'Class Title']], on='Class', how='left')
 
-df_streamlit = ssic_df.iloc[:, [0, 1, 9, 10, 11, 12, 13]].drop_duplicates()
-ssic_1_sl = ssic_1.iloc[:, [0, 1]].drop_duplicates().reset_index(drop=True)
+####################################################################################################
+# mapping
+level_map = {
+    'Section': ('Section', ssic_df.iloc[:, [0, 1, 9, 10, 11, 12, 13]].drop_duplicates()),
+    'Division': ('Division', ssic_df.iloc[:, [0, 1, 6, 10, 11, 12, 13]].drop_duplicates()),
+    'Group': ('Group', ssic_df.iloc[:, [0, 1, 7, 10, 11, 12, 13]].drop_duplicates()),
+    'Class': ('Class', ssic_df.iloc[:, [0, 1, 8, 10, 11, 12, 13]].drop_duplicates()),
+    'Subclass': ('Subclass', ssic_df.iloc[:, [0, 1, 9, 10, 11, 12, 13]].drop_duplicates())
+}
 
-lvl_train = 'Section'
+# Get the values for a and b based on the lvl_train
+lvl_train, df_streamlit = level_map.get(level, ('default_a', 'default_b'))
+
 lvl_train_title = lvl_train + " Title"
 
+# prep ssic_n dictionary df_prep
 df_prep = ssic_df[[lvl_train, 'Detailed Definitions']]
 df_prep['encoded_cat'] = df_prep[lvl_train].astype('category').cat.codes
-
-data_texts = df_prep['Detailed Definitions'].to_list() # Features (not tokenized yet)
-data_labels = df_prep['encoded_cat'].to_list() # Labels
-
 df_prep = df_prep[[lvl_train, 'encoded_cat']].drop_duplicates()
 
+# WIP
+# ssic_1_sl = ssic_1.iloc[:, [0, 1]].drop_duplicates().reset_index(drop=True)
+
+
+
+####################################################################################################
+# start of streamlit
+####################################################################################################
+
+# Define CSS styles
+custom_styles = """
+<style>
+    .appview-container .main .block-container {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+</style>
+"""
+# Display CSS styles using st.markdown
+st.markdown(custom_styles, unsafe_allow_html=True)
 
 # page title
 st.title("Business Description Classifier")
 # page subheader
-st.subheader("Classify Business Descriptions into 21 Section Categories")
+st.subheader("Classify Business Descriptions into 204 Group Categories")
 
 # Add some text explaining the app
 st.write("""
 Welcome to the Business Description Classifier! This application utilizes a multiclass text classification model 
-to categorize business descriptions into one of 21 section categories. Simply input your business description, 
+to categorize business descriptions into one of 204 Group categories. Simply input your business description, 
 and the model will analyze the text and provide a list predicted categories.
 
 ##### How to Use
@@ -143,7 +157,7 @@ and the model will analyze the text and provide a list predicted categories.
 
 ##### About the Model
 This model has been trained on a diverse dataset of business descriptions and is capable of understanding and 
-classifying a wide range of business activities. The 21 section categories cover various industry sectors, 
+classifying a wide range of business activities. The 204 Group categories cover various industry sectors, 
 providing accurate and meaningful classifications for your business needs.
 
 ##### Examples
@@ -171,21 +185,6 @@ if user_input:
     output_array = output.numpy() # Logits (+ve to -ve)
     # output_array = tf.nn.softmax(output, axis=-1).numpy() # Probability (0-1)
 
-    # # Perform inference
-    # outputs = model(**inputs)
-
-    # # Access logits
-    # logits = outputs.logits
-
-    # # Convert logits to probabilities
-    # probabilities = tf.nn.softmax(logits, axis=-1)
-
-    # # Convert probabilities to numpy array
-    # output_array = probabilities.numpy()
-    
-    # output_array = tf.nn.softmax(outputs, axis=-1).numpy()
-    # output_array = outputs.numpy() # Logits (+ve to -ve)
-    
     ###############################################################################################################################################
     # Define specific weights for the classes (example weights, for Probability)
     # class_weights = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.5, 0.5, 0.5, 1, 1, 1, 1, 1, 1, 1, 1]  
@@ -203,8 +202,6 @@ if user_input:
 
     sorted_output_df.columns = ['encoded_cat', 'Value']
 
-    lvl_train = 'Section'
-
     # Conditional statements based on lvl_train
     if lvl_train == 'Section':
         ssic_lvl = ssic_1
@@ -220,7 +217,7 @@ if user_input:
     # Merge DataFrames
     lvl_dict = df_prep[[lvl_train, 'encoded_cat']].drop_duplicates()
     lvl_ref = ssic_lvl[[lvl_train, lvl_train_title]].drop_duplicates()
-    merged_df = lvl_dict.merge(lvl_ref, on='Section', how='left')
+    merged_df = lvl_dict.merge(lvl_ref, on=lvl_train, how='left')
     merged_df2 = sorted_output_df.merge(merged_df, on='encoded_cat', how='left')
 
     # Display the result as a table

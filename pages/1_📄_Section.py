@@ -118,18 +118,8 @@ custom_styles = """
         padding-top: 1rem;
         padding-bottom: 1rem;
     }
-
-
 </style>
 """
-    # img.full-width {
-    #     max-width: 100%;
-    #     width: 100vw; /* Set image width to full viewport width */
-    #     height: auto; /* Maintain aspect ratio */
-    #     display: block; /* Remove any default space around the image */
-    #     margin-left: auto;
-    #     margin-right: auto;
-    # }
 
 # Display CSS styles using st.markdown
 st.markdown(custom_styles, unsafe_allow_html=True)
