@@ -164,8 +164,8 @@ if user_input:
     inputs = tokenizer(user_input, return_tensors="tf")
     outputs = model(inputs["input_ids"])[0]
     
-    # output_array = tf.nn.softmax(output, axis=-1).numpy()
-    output_array = outputs.numpy() # Logits (+ve to -ve)   
+    output_array = tf.nn.softmax(outputs, axis=-1).numpy()
+    # output_array = output.numpy() # Logits (+ve to -ve)
     
     # Define class weights
     class_weights = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
