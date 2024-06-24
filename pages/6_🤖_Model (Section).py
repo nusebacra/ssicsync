@@ -165,7 +165,7 @@ if user_input:
     outputs = model(inputs["input_ids"])
     
     # output_array = tf.nn.softmax(output, axis=-1).numpy()
-    output_array = output.numpy() # Logits (+ve to -ve)   
+    output_array = outputs.numpy() # Logits (+ve to -ve)   
     
     # Define class weights
     class_weights = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
