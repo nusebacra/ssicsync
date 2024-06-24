@@ -1,0 +1,26 @@
+streamlit==1.36.0
+gcsfs==2024.6.0
+aiohttp!=4.0.0a0, !=4.0.0a1
+decorator>4.1.2
+fsspec==2024.6.0
+google-auth>=1.2
+google-auth-oauthlib
+google-cloud-storage
+requests
+st-files-connection
+Pillow==10.3.0
+scipy==1.13.1
+pandas==2.2.2
+setuptools==65.5.0
+scikit-learn==1.5.0
+tensorflow==2.16.1
+numpy==1.26.4
+matplotlib==3.9.0
+seaborn==0.13.2
+git+https://github.com/huggingface/transformers.git
+openpyxl==3.1.4
+tf-keras==2.16.0
+torch==2.2.2 
+torchvision==0.17.2 
+torchaudio==2.2.2
+
