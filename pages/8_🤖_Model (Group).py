@@ -20,8 +20,8 @@ st.balloons()
 
 # load model directly from huggingface
 from transformers import AutoTokenizer, TFAutoModelForSequenceClassification
-tokenizer = AutoTokenizer.from_pretrained("nusebacra/ssicsync_division_classifier")
-model = TFAutoModelForSequenceClassification.from_pretrained("nusebacra/ssicsync_division_classifier")
+tokenizer = AutoTokenizer.from_pretrained("nusebacra/ssicsync_group_classifier")
+model = TFAutoModelForSequenceClassification.from_pretrained("nusebacra/ssicsync_group_classifier")
 
 
 
