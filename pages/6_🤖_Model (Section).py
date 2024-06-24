@@ -165,7 +165,7 @@ if user_input:
 
     inputs = tokenizer(user_input, return_tensors="tf")
 
-    output = loaded_model(predict_input)[0]
+    output = model(predict_input)[0]
 
     # Convert the output tensor to numpy array
     output_array = output.numpy() # Logits (+ve to -ve)
