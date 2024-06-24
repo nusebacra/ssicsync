@@ -217,7 +217,7 @@ if user_input:
     # Merge DataFrames
     lvl_dict = df_prep[[lvl_train, 'encoded_cat']].drop_duplicates()
     lvl_ref = ssic_lvl[[lvl_train, lvl_train_title]].drop_duplicates()
-    merged_df = lvl_dict.merge(lvl_ref, on='Section', how='left')
+    merged_df = lvl_dict.merge(lvl_ref, on=lvl_train, how='left')
     merged_df2 = sorted_output_df.merge(merged_df, on='encoded_cat', how='left')
 
     # Display the result as a table
