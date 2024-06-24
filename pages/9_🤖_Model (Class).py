@@ -116,6 +116,10 @@ lvl_train_title = lvl_train + " Title"
 # prep ssic_n dictionary df_prep
 df_prep = ssic_df[[lvl_train, 'Detailed Definitions']]
 df_prep['encoded_cat'] = df_prep[lvl_train].astype('category').cat.codes
+
+data_texts = df_prep['Detailed Definitions'].to_list() # Features (not tokenized yet)
+data_labels = df_prep['encoded_cat'].to_list() # Labels
+
 df_prep = df_prep[[lvl_train, 'encoded_cat']].drop_duplicates()
 
 # WIP
@@ -207,11 +211,23 @@ with col2:
 
         sorted_output_df.columns = ['encoded_cat', 'Value']
 
-        # Merge DataFrames
+        # Conditional statements based on lvl_train
+        if lvl_train == 'Section':
+            ssic_lvl = ssic_1
+        elif lvl_train == 'Division':
+            ssic_lvl = ssic_2
+        elif lvl_train == 'Group':
+            ssic_lvl = ssic_3
+        elif lvl_train == 'Class':
+            ssic_lvl = ssic_4
+        elif lvl_train == 'SSIC 2020':
+            ssic_lvl = ssic_5
+
+        # need to load ssic_df and df
         lvl_dict = df_prep[[lvl_train, 'encoded_cat']].drop_duplicates()
-        lvl_ref = ssic_4[[lvl_train, lvl_train_title]].drop_duplicates()
-        merged_df = lvl_dict.merge(lvl_ref, on=lvl_train, how='left')
-        merged_df2 = sorted_output_df.merge(merged_df, on='encoded_cat', how='left')
+        lvl_ref = ssic_lvl[[lvl_train, lvl_train_title]].drop_duplicates()
+        merged_df = lvl_dict.merge(lvl_ref, on= lvl_train, how='left')
+        merged_df2 = sorted_output_df.merge(merged_df, on = 'encoded_cat', how='left')
 
         # Display the result as a table
         st.subheader("Prediction Results")
