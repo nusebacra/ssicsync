@@ -4,7 +4,7 @@ import streamlit as st
 import pandas as pd
 
 # prep validation data
-data_validation_filepath = "LLM_Test\data_validation.csv"
+data_validation_filepath = "data_validation.csv"
 
 data_validation = pd.read_csv(data_validation_filepath, dtype = str)
 
