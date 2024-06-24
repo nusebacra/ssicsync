@@ -7,6 +7,7 @@ import seaborn as sns
 import os
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import tensorflow as tf
+import torch
 
 
 # Set page config
@@ -162,7 +163,9 @@ if user_input:
     # output = loaded_model(predict_input)[0]
 
     inputs = tokenizer(user_input, return_tensors="tf")
-    outputs = model(inputs)
+    # Perform inference
+    with torch.no_grad():
+        outputs = model(**inputs)
     
     # output_array = tf.nn.softmax(outputs, axis=-1).numpy()
     output_array = outputs.numpy() # Logits (+ve to -ve)
