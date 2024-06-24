@@ -6,7 +6,7 @@ import pandas as pd
 # prep validation data
 data_validation_filepath = "data validation.csv"
 
-data_validation = pd.read_csv(data_validation_filepath, dtype = str)
+data_validation = pd.read_csv(data_validation_filepath)
 
 import matplotlib.pyplot as plt
 import seaborn as sns
