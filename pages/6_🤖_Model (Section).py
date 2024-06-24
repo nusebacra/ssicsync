@@ -162,10 +162,10 @@ if user_input:
     # output = loaded_model(predict_input)[0]
 
     inputs = tokenizer(user_input, return_tensors="tf")
-    outputs = model(inputs)[0]
+    outputs = model(inputs["input_ids"])[0]
     
-    output_array = tf.nn.softmax(outputs, axis=-1).numpy()
-    # output_array = output.numpy() # Logits (+ve to -ve)
+    # output_array = tf.nn.softmax(outputs, axis=-1).numpy()
+    output_array = outputs.numpy() # Logits (+ve to -ve)
     
     ###############################################################################################################################################
     # Define specific weights for the classes (example weights, for Probability)
