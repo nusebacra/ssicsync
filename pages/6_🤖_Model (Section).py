@@ -5,7 +5,7 @@ from sklearn import datasets
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
-
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from st_files_connection import FilesConnection
 
 
@@ -30,17 +30,20 @@ import pandas as pd
 
 ###############################################################################################################################################
 # Create connection object and retrieve file contents.
-# Specify input format is a csv and to cache the result for 600 seconds.
-conn = st.connection('gcs', type=FilesConnection)
+# # Specify input format is a csv and to cache the result for 600 seconds.
+# conn = st.connection('gcs', type=FilesConnection)
 
-# Specify the paths to the model and tokenizer files in the bucket.
-model_files_path = "nusebacra_bucket1/models/distilBert Text Multiclass by 21 Section caa 200624"
+# # Specify the paths to the model and tokenizer files in the bucket.
+# model_files_path = "nusebacra_bucket1/models/distilBert Text Multiclass by 21 Section caa 200624"
 
 # save_directory = "LLM_Test/distilBert Text Multiclass by 21 Section caa 200624"
 ###############################################################################################################################################
 
-loaded_tokenizer = DistilBertTokenizer.from_pretrained(model_files_path) #TODO
-loaded_model = TFDistilBertForSequenceClassification.from_pretrained(model_files_path) #TODO
+# loaded_tokenizer = DistilBertTokenizer.from_pretrained(model_files_path) #TODO
+# loaded_model = TFDistilBertForSequenceClassification.from_pretrained(model_files_path) #TODO
+
+tokenizer = AutoTokenizer.from_pretrained("nusebacra/ssicsync_section_classifier")
+model = AutoModelForSequenceClassification.from_pretrained("nusebacra/ssicsync_section_classifier")
 
 
 
