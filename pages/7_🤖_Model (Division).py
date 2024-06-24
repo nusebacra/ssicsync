@@ -140,7 +140,7 @@ st.markdown(custom_styles, unsafe_allow_html=True)
 # page title
 st.title("Business Description Classifier")
 
-col1, col2 = st.columns([1,2])
+col1, col2 = st.columns([1,1])
 
 with col1:
     st.dataframe(ssic_n_sl, use_container_width=True)
