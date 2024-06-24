@@ -162,8 +162,11 @@ user_input = st.text_area("Enter Business Description:", "")
 
 if user_input:
     # Process the input text using the model
-    predict_input = loaded_tokenizer.encode(user_input, truncation=True, padding=True, return_tensors="tf")
-    output = loaded_model(predict_input)[0]
+    # predict_input = loaded_tokenizer.encode(user_input, truncation=True, padding=True, return_tensors="tf")
+    # output = loaded_model(predict_input)[0]
+
+    inputs = tokenizer(user_input, return_tensors="tf")
+    outputs = model(inputs["input_ids"])
     
     # output_array = tf.nn.softmax(output, axis=-1).numpy()
     output_array = output.numpy() # Logits (+ve to -ve)   
